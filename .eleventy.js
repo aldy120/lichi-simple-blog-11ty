@@ -51,6 +51,8 @@ const pluginRss = require("@11ty/eleventy-plugin-rss");
 const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 const pluginNavigation = require("@11ty/eleventy-navigation");
 const markdownIt = require("markdown-it");
+const markdownItKatex = require("markdown-it-katex");
+const katex = require('katex');
 const markdownItAnchor = require("markdown-it-anchor");
 const localImages = require("./third_party/eleventy-plugin-local-images/.eleventy.js");
 const CleanCSS = require("clean-css");
@@ -182,6 +184,17 @@ module.exports = function (eleventyConfig) {
   // But without this the JS build artefacts doesn't trigger a build.
   eleventyConfig.setUseGitIgnore(false);
 
+  // handle LaTeX
+  eleventyConfig.addFilter( 'latex', content => {
+    return content.replace( /\$\$(.+?)\$\$/g, ( _, equation ) => {
+      const cleanEquation = equation
+        .replace( /&lt;/g, '<' )
+        .replace( /&gt;/g, '>' )
+
+      return katex.renderToString( cleanEquation, { throwOnError: true } )
+    })
+  })
+
   /* Markdown Overrides */
   let markdownLibrary = markdownIt({
     html: true,
@@ -191,12 +204,12 @@ module.exports = function (eleventyConfig) {
     permalink: true,
     permalinkClass: "direct-link",
     permalinkSymbol: "#",
-  });
+  }).use(markdownItKatex);
   eleventyConfig.setLibrary("md", markdownLibrary);
 
   // Browsersync Overrides
   eleventyConfig.setBrowserSyncConfig({
-    middleware: cspDevMiddleware,
+    // middleware: cspDevMiddleware,
     callbacks: {
       ready: function (err, browserSync) {
         const content_404 = fs.readFileSync("_site/404.html");

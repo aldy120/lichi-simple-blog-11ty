@@ -8,6 +8,8 @@ export default {
       format: "iife",
       sourcemap: true,
       plugins: [terser()],
+      globals: {katex: 'katex'}
     },
   ],
+  external: ['katex']
 };

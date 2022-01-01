@@ -54,6 +54,8 @@
     <script csp-hash>if (/Mac OS X/.test(navigator.userAgent))document.documentElement.classList.add('apple')
     </script>
     <!-- css is inserted by optimize-html custom plugin -->
+    <link rel="preload" href="/css/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/css/katex.min.css"></noscript>
   </head>
   <body>
     <header>
@@ -81,7 +83,7 @@
     <main>
       <article>
         {% block article %}
-          {{ content | safe }}
+          {{ content | latex | safe }}
         {% endblock %}
 
         {% if page.url and page.url.indexOf("/posts/") > -1 %}
